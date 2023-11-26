@@ -1,0 +1,18 @@
+[Unit]
+Description=Shepherd resize image helper Service for Hills Road RoboCon
+After=shepherd_tmpfs_hack.service
+Requisite=shepherd_tmpfs_hack.service
+StartLimitIntervalSec=0
+
+[Service]
+WorkingDirectory=/home/pi/shepherd
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+Group=root
+ExecStart=/usr/bin/env python3 /home/pi/shepherd/helper.py
+
+[Install]
+WantedBy=multi-user.target
+

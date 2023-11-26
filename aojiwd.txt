@@ -1,0 +1,10 @@
+# Skyler
+# The orange USB
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="9207145CCF306196036",     ACTION=="add",     SYMLINK+="DebugUSB", RUN+="/bin/systemctl --no-block start debug_usb@%k.service",   GOTO="custom_names_end"
+# Holly
+# Lexar USB
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="AA04014300010616",     ACTION=="add",     SYMLINK+="DebugUSB", RUN+="/bin/systemctl --no-block start debug_usb@%k.service",   GOTO="custom_names_end"
+
+
+
+9207145CCF306196036
