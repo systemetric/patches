@@ -1,3 +1,5 @@
+# WARNING THIS IS INCOMPLETE DO NOT USE THIS AT ALL
+#
 #               === Unifier Patch Applier ===
 # This patch application script aims to unify the two patch standards
 # that exist, Skyler's and Will's separate standards. As such, 

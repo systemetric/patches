@@ -1,6 +1,15 @@
 import base64
+import shutil
+import sys
 path = "./" # Ending in /
 patch = "RoboCon2024_p1"
+
+prezipped = True
+if len(sys.argv) >=2:
+   prezipped = bool(sys.argv[1])
+
+if not prezipped:
+   shutil.make_archive("./"+patch,"zip",patch)
 
 the_zip = open(f'{path}{patch}.zip', 'rb')
 zip_read = the_zip.read()
@@ -17,13 +26,6 @@ import base64
 import robot
 import time
 
-print ("Press start to start patch")
-R = robot.Robot()
-
-zo = open('/tmp/patch.zip','wb')
-zo.write(base64.b64decode(z64.encode(\'ascii\')))
-zo.close()
-
 import os
 import os.path
            
@@ -38,9 +40,15 @@ if os.path.isfile(f"/{patch}"):
    print("")
    print ("Don't Walk, Do the Robot")
    print("")
-   import robot
    R=robot.Robot()
 else:
+   print ("Press start to start patch")
+   R = robot.Robot()
+
+   zo = open('/tmp/patch.zip','wb')
+   zo.write(base64.b64decode(z64.encode(\'ascii\')))
+   zo.close()
+
    print(f"Applying {patch}")
    print("")
    os.system('/usr/bin/unzip -q /tmp/patch.zip -d /tmp')
@@ -55,13 +63,16 @@ else:
    print("")
    os.system(f"cp -av /tmp/{patch}/home/pi/Pi_low.X.production.hex    /home/pi/")
    os.system("/usr/local/bin/pymcuprog write -f /home/pi/Pi_low.X.production.hex -d avr32da32 -t uart  -u /dev/ttyAMA0 --erase --verify")
+   time.sleep(1) # Wait for config to finish before trying to call stuff
+   R.set_user_led(True) # Restart LED after firmware update
    print("Updating RoboCon files")
    print("")
    os.system(f'cp -a /tmp/{patch}/home/pi/* /home/pi')
    os.system(f'cp -a /tmp/{patch}/etc/* /etc')
+   os.system(f'sed -i "s/\\(.*_logger.info(\"Patch Version:\\).*/\\1     {patch}\"\\)/" /home/pi/robot/robot/wrapper.py')
    os.system("chown pi:pi /home/pi")
    print("")
-   file = open(f'/{patch}','wa')
+   file = open(f'/{patch}','w+')
    file.write("Patch Applied by Python")
    file.close()
    print("Restarting helper services")
@@ -71,7 +82,8 @@ else:
    print("")
    print("Rebooting")
    time.sleep(1)
-   os.system(f'rm /home/pi/robotsrc/{patch}.py')
+   os.system(f'rm /home/pi/shepherd/robotsrc/{patch}.py')
    os.system('/sbin/reboot')
 """)
-file.close() 
+file.close()
+print(f"Patch packed successfully :D (pre-zipped file: {prezipped})")
