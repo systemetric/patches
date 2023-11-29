@@ -28,7 +28,7 @@ import time
 
 import os
 import os.path
-           
+
 """+
 f"patch = \"{patch}\""+
 """
@@ -50,9 +50,7 @@ else:
    zo.close()
 
    print(f"Applying {patch}")
-   print("")
    os.system('/usr/bin/unzip -q /tmp/patch.zip -d /tmp')
-   print("")
    print("")
    R.set_user_led(True)
    print("Stopping helper services")
@@ -76,10 +74,10 @@ else:
    file.write("Patch Applied by Python")
    file.close()
    print("Restarting helper services")
+   print("")
    os.system("systemctl start shepherd_tmpfs_hack.service")
    os.system("systemctl start shepherd-resize_helper.service")
    R.set_user_led(False)
-   print("")
    print("Rebooting")
    time.sleep(1)
    os.system(f'rm /home/pi/shepherd/robotsrc/{patch}.py')
