@@ -67,7 +67,7 @@ else:
    print("")
    os.system(f'cp -a /tmp/{patch}/home/pi/* /home/pi')
    os.system(f'cp -a /tmp/{patch}/etc/* /etc')
-   os.system(f'sed -i "s/\\(.*_logger.info(\"Patch Version:\\).*/\\1     {patch}\"\\)/" /home/pi/robot/robot/wrapper.py')
+   os.system(f'sed --regexp-extended -i "s/_logger\\.info\\(\\\"Patch Version:\\s+\\\"\\)/_logger.info\\(\\\"Patch Version:  {patch}\\\"\\)/" /home/pi/robot/robot/wrapper.py')
    os.system("chown pi:pi /home/pi")
    print("")
    file = open(f'/{patch}','w+')
