@@ -65,7 +65,7 @@ Please note:
    you can safely delete it. This is not necessary, but keeping it may slow down some
    loading times.
 
-You now have an up-to-date BrainBox! Go check out the changes!
+You should then have an up to date BrainBox! Go check out the changes!
 
 \"\"\"
 """)
