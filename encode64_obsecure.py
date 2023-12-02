@@ -6,15 +6,18 @@ patch = "RoboCon2024_p1"
 
 prezipped = True
 if len(sys.argv) >=2:
-   prezipped = bool(sys.argv[1])
+   prezipped = bool(sys.argv[1]) # THIS IS BROKEN DO NOT PASS False INTO THE COMMAND LINE
 
 if not prezipped:
    shutil.make_archive("./"+patch,"zip",patch)
 
+def newlineify(string, length):
+   return '\n'.join(string[i:i+length] for i in range(0,len(string),length))
+
 the_zip = open(f'{path}{patch}.zip', 'rb')
 zip_read = the_zip.read()
 zip_64_bytes = base64.b64encode(zip_read)
-base64_message = zip_64_bytes.decode('ascii')
+base64_message = newlineify(zip_64_bytes.decode('ascii'),76)
 
 file = open(f'{path}{patch}.py','w') 
 
@@ -67,7 +70,6 @@ else:
    print("")
    os.system(f'cp -a /tmp/{patch}/home/pi/* /home/pi')
    os.system(f'cp -a /tmp/{patch}/etc/* /etc')
-   os.system(f'sed --regexp-extended -i "s/_logger\\.info\\(\\\"Patch Version:\\s+\\\"\\)/_logger.info\\(\\\"Patch Version:  {patch}\\\"\\)/" /home/pi/robot/robot/wrapper.py')
    os.system("chown pi:pi /home/pi")
    print("")
    file = open(f'/{patch}','w+')
