@@ -21,7 +21,13 @@ base64_message = newlineify(zip_64_bytes.decode('ascii'),76)
 
 file = open(f'{path}{patch}.py','w') 
 
- 
+file.write("""
+\"\"\"
+
+
+\"\"\"
+""")
+
 file.write("z64 = \"\"\"" + base64_message+ "\"\"\"\n") 
 
 file.write("""
