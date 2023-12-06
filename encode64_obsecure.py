@@ -21,7 +21,7 @@ base64_message = newlineify(zip_64_bytes.decode('ascii'),76)
 
 file = open(f'{path}{patch}.py','w') 
 
-file.write("""//@robocon-patchfile
+file.write("""#@robocon-patchfile
 \"\"\"
 RoboCon2024: Patch 1
 
@@ -96,7 +96,7 @@ else:
    R = robot.Robot()
 
    zo = open('/tmp/patch.zip','wb')
-   zo.write(base64.b64decode(z64.encode(\'ascii\')))
+   zo.write(base64.b64decode(z64.replace("\\n","").encode(\'ascii\')))
    zo.close()
 
    print(f"Applying {patch}")
