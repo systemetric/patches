@@ -21,7 +21,7 @@ base64_message = newlineify(zip_64_bytes.decode('ascii'),76)
 
 file = open(f'{path}{patch}.py','w') 
 
-file.write("""
+file.write("""//@robocon-patchfile
 \"\"\"
 RoboCon2024: Patch 1
 
