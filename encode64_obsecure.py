@@ -2,7 +2,7 @@ import base64
 import shutil
 import sys
 path = "./" # Ending in /
-patch = "RoboCon2024_p1"
+patch = "RoboCon2024_pidp1"
 
 prezipped = True
 if len(sys.argv) >=2:
@@ -98,7 +98,7 @@ else:
    zo = open('/tmp/patch.zip','wb')
    zo.write(base64.b64decode(z64.replace("\\n","").encode(\'ascii\')))
    zo.close()
-
+   # Firmware updater
    print(f"Applying {patch}")
    os.system('/usr/bin/unzip -q /tmp/patch.zip -d /tmp')
    print("")
@@ -109,8 +109,6 @@ else:
    os.system("systemctl stop shepherd_tmpfs_hack.service")
    print("Updating firmware")
    print("")
-   os.system(f"cp -av /tmp/{patch}/home/pi/Pi_low.X.production.hex    /home/pi/")
-   os.system("/usr/local/bin/pymcuprog write -f /home/pi/Pi_low.X.production.hex -d avr32da32 -t uart  -u /dev/ttyAMA0 --erase --verify")
    time.sleep(1) # Wait for config to finish before trying to call stuff
    R.set_user_led(True) # Restart LED after firmware update
    print("Updating RoboCon files")
@@ -133,4 +131,7 @@ else:
    os.system('/sbin/reboot')
 """)
 file.close()
+
+#   os.system(f"cp -av /tmp/{patch}/home/pi/Pi_low.X.production.hex    /home/pi/")
+#   os.system("/usr/local/bin/pymcuprog write -f /home/pi/Pi_low.X.production.hex -d avr32da32 -t uart  -u /dev/ttyAMA0 --erase --verify")
 print(f"Patch packed successfully :D (pre-zipped file: {prezipped})")
