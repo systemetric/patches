@@ -2,7 +2,7 @@ import base64
 import shutil
 import sys
 path = "./" # Ending in /
-patch = "RoboCon2024_pidp1"
+patch = "RoboCon2024_Releasepid"
 
 prezipped = True
 if len(sys.argv) >=2:
@@ -107,7 +107,7 @@ else:
    print("")
    os.system("systemctl stop shepherd-resize_helper.service")
    os.system("systemctl stop shepherd_tmpfs_hack.service")
-   print("Updating firmware")
+   print("Skipping Updating firmware")
    print("")
    time.sleep(1) # Wait for config to finish before trying to call stuff
    R.set_user_led(True) # Restart LED after firmware update
@@ -122,6 +122,8 @@ else:
    file.close()
    print("Restarting helper services")
    print("")
+   os.system("pip3 install ${PATCH_DIRECTORY}/aionotify-0.2.0-py3-none-any.whl")
+   os.system("pip3 install ${PATCH_DIRECTORY}/websockets-11.0.3-py3-none-any.whl")
    os.system("systemctl start shepherd_tmpfs_hack.service")
    os.system("systemctl start shepherd-resize_helper.service")
    R.set_user_led(False)
