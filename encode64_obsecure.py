@@ -1,12 +1,11 @@
 import base64
 import shutil
 import sys
-path = "./" # Ending in /
-patch = "RoboCon2024_Releasepid"
+BUILD_LOCATION = "./built/" # Ending in /
+ZIP_LOCATION = "./zips/"
+patch = "RoboCon2024_p1"
 
 prezipped = True
-if len(sys.argv) >=2:
-   prezipped = bool(sys.argv[1]) # THIS IS BROKEN DO NOT PASS False INTO THE COMMAND LINE
 
 if not prezipped:
    shutil.make_archive("./"+patch,"zip",patch)
@@ -14,12 +13,12 @@ if not prezipped:
 def newlineify(string, length):
    return '\n'.join(string[i:i+length] for i in range(0,len(string),length))
 
-the_zip = open(f'{path}{patch}.zip', 'rb')
+the_zip = open(f'{ZIP_LOCATION}{patch}.zip', 'rb')
 zip_read = the_zip.read()
 zip_64_bytes = base64.b64encode(zip_read)
 base64_message = newlineify(zip_64_bytes.decode('ascii'),76)
 
-file = open(f'{path}{patch}.py','w') 
+file = open(f'{BUILD_LOCATION}{patch}.py','w') 
 
 file.write("""#@robocon-patchfile
 \"\"\"
@@ -107,7 +106,9 @@ else:
    print("")
    os.system("systemctl stop shepherd-resize_helper.service")
    os.system("systemctl stop shepherd_tmpfs_hack.service")
-   print("Skipping Updating firmware")
+   print("Updating firmware")
+   os.system(f"cp -av /tmp/{patch}/home/pi/Pi_low.X.production.hex    /home/pi/")
+   os.system("/usr/local/bin/pymcuprog write -f /home/pi/Pi_low.X.production.hex -d avr32da32 -t uart  -u /dev/ttyAMA0 --erase --verify")
    print("")
    time.sleep(1) # Wait for config to finish before trying to call stuff
    R.set_user_led(True) # Restart LED after firmware update
@@ -122,8 +123,6 @@ else:
    file.close()
    print("Restarting helper services")
    print("")
-   os.system("pip3 install ${PATCH_DIRECTORY}/aionotify-0.2.0-py3-none-any.whl")
-   os.system("pip3 install ${PATCH_DIRECTORY}/websockets-11.0.3-py3-none-any.whl")
    os.system("systemctl start shepherd_tmpfs_hack.service")
    os.system("systemctl start shepherd-resize_helper.service")
    R.set_user_led(False)
@@ -134,6 +133,5 @@ else:
 """)
 file.close()
 
-#   os.system(f"cp -av /tmp/{patch}/home/pi/Pi_low.X.production.hex    /home/pi/")
-#   os.system("/usr/local/bin/pymcuprog write -f /home/pi/Pi_low.X.production.hex -d avr32da32 -t uart  -u /dev/ttyAMA0 --erase --verify")
+
 print(f"Patch packed successfully :D (pre-zipped file: {prezipped})")
