@@ -7,7 +7,7 @@ from io import BytesIO
 parser = argparse.ArgumentParser(
     prog="Robocon Patch Builder",
     description="Builds a patch into a .py for release to teams.",
-    epilog="Pass the patch directory in as the command line argument to run with default settings.")
+    epilog="Builds the patch specified by patchname into a .py file. When dev is specified, the patch will ignore the apply flag.")
 
 parser.add_argument("patchname")
 parser.add_argument("-o","--output-location", default="built")
@@ -18,6 +18,7 @@ parser.add_argument("--write-zip-out",action="store_true")
 parser.add_argument("--no-firmware",action="store_true")
 parser.add_argument("--no-packages",action="store_true")
 parser.add_argument("--no-description",action="store_true")
+parser.add_argument("--require-packages-at-root") 
 
 args = parser.parse_args()
 
@@ -44,10 +45,15 @@ with ZipFile(mem_zip,"w",ZIP_DEFLATED) as zip_handle:
                 firmware_update = True
                 log("Found Firmware")
 
-            if filename.endswith(".whl") and root==patch_path:
+            if filename.endswith(".whl") and (root==patch_path or not args.require_packages_at_root):
                 if len(packages) == 0:
                     log("Found packages")
-                packages.append(filename)
+                packages.append(
+                    os.path.relpath(
+                        os.path.join(root,filename), 
+                        patch_path
+                        )
+                    )
             
 
             if filename=="description.patchmeta" and root==patch_path:
@@ -55,17 +61,15 @@ with ZipFile(mem_zip,"w",ZIP_DEFLATED) as zip_handle:
             elif filename in SHELL_LOAD_FILES and root==patch_path:
                 pass
             else:
-                zip_handle.write(
-                    os.path.join(root,filename),
-                    os.path.relpath(
-                        os.path.join(root,filename),
-                        os.path.join(patch_path,"..")
-                    )
-                )
-                log(f"Loading \"{os.path.relpath(
+                path_within_zip = os.path.relpath(
                             os.path.join(root,filename),
                             os.path.join(patch_path,"..")
-                        )}\"")
+                        )
+                zip_handle.write(
+                    os.path.join(root,filename),
+                    path_within_zip
+                )
+                log(f"Loading \"{path_within_zip}\"")
     log("Loaded into zip format")
 
 if args.no_firmware:
