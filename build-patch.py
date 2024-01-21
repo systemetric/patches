@@ -108,6 +108,9 @@ processed_b64_mem_zip = newlineify(b64_mem_zip.decode("ascii"),76)
 
 log("Processed to string")
 
+if not os.path.exists(args.output_location):
+    os.makedirs(args.output_location, exist_ok=True) # makes needed dirs recursively
+
 with open(os.path.join(args.output_location,out_patchname+".py"),"w") as file:
     file.write("#@robocon-patchfile\n")
     file.write("\"\"\"\n" + description + "\n\"\"\"\n" if len(description)>0 else "")
