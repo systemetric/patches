@@ -1,0 +1,41 @@
+RoboCon2024: Patch 2
+
+This patch applies to all users.
+
+This patch contains the following bugfixes and improvements
+   - Built-in camera resolution can be changed.
+   - USB cameras' resolution and focal lengths can be changed.
+   - Vision section of docs updated to match with instructions.
+
+To apply the patch, make sure that this file is downloaded on the 
+device you will be connecting to your robot.
+
+Step 1: Navigate to the BrainBox's homepage. Once here,
+select the "Editor" option from the bottom of the page. When the 
+editor has loaded, select the Upload button in the project panel (next
+to the New Project button). 
+
+Step 2: A window should appear giving you the option to select a file to
+upload. In this window, select the version of the patch file that you have 
+downloaded on the device and open it. It should now be opened in the Editor.
+
+Step 3:
+Make sure that the patch file is selected, and then click the Run button
+as if the patch were a normal project. Your robot may take a while to upload
+the file before you see anything in the debug log or any other places. 
+PLEASE BE PATIENT
+
+Please note:
+   - The BrainBox may take a long time to do certain actions (> 1 minute). Be patient.
+   - When the patch starts, the blue User LED should be on. At some points during the
+   patch, this and other LEDs may turn off or flash. This should return to normal 
+   after a couple seconds.
+   - At the end of the patch, the BrainBox will restart - the WiFi will shut off and 
+   the battery LEDs will play their start up animation. This is expected.
+   - When your device disconnects from the BrainBox, we advise you close any open Editor
+   tabs until you reconnect to the robot after its restart. 
+   - If the patch file is still present when you reconnect after the patch is complete, 
+   you can safely delete it. This is not necessary, but keeping it may slow down some
+   loading times.
+
+You should then have an up to date BrainBox! Go check out the changes!
