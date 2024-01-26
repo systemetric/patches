@@ -13,12 +13,13 @@ parser.add_argument("patchname")
 parser.add_argument("-o","--output-location", default="built")
 parser.add_argument("-d","--description",default="")
 parser.add_argument("-v","--verbose",action="store_true")
+parser.add_argument("-e","--on-apply", default="")
 parser.add_argument("--dev", action="store_true")
 parser.add_argument("--write-zip-out",action="store_true")
 parser.add_argument("--no-firmware",action="store_true")
 parser.add_argument("--no-packages",action="store_true")
 parser.add_argument("--no-description",action="store_true")
-parser.add_argument("--require-packages-at-root") 
+parser.add_argument("--root-packages", action="store_true")
 
 args = parser.parse_args()
 
@@ -32,6 +33,7 @@ def newlineify(string, length):
 SHELL_LOAD_FILES = ["patch.sh","apply.sh"]
 description = ""
 firmware_update = False
+on_apply_found = False
 packages = []
 out_patchname = args.patchname if not args.dev else args.patchname+".preview"
 mem_zip = BytesIO()
@@ -40,36 +42,36 @@ with ZipFile(mem_zip,"w",ZIP_DEFLATED) as zip_handle:
     patch_path = os.path.join("patches",args.patchname)
     for root, directories, files in os.walk(patch_path, topdown=True):
         for filename in files:
-            
+            rel_path_within_patch = os.path.relpath(os.path.join(root,filename), patch_path)
+
+            # Special processing
             if filename == "Pi_low.X.production.hex" and root==os.path.join(patch_path,"home","pi"):
                 firmware_update = True
                 log("Found Firmware")
 
-            if filename.endswith(".whl") and (root==patch_path or not args.require_packages_at_root):
+            if filename.endswith(".whl") and (root==patch_path or not args.root_packages):
                 if len(packages) == 0:
                     log("Found packages")
                 packages.append(
-                    os.path.relpath(
-                        os.path.join(root,filename), 
-                        patch_path
-                        )
+                    rel_path_within_patch
                     )
             
+            is_on_apply = False
+            if os.path.join(rel_path_within_patch)==os.path.join(args.on_apply):
+                on_apply_found = True
+                is_on_apply = True
 
+            # Exclusions from normal zip build
             if filename=="description.patchmeta" and root==patch_path:
                 description = open(os.path.join(patch_path,filename)).read()
-            elif filename in SHELL_LOAD_FILES and root==patch_path:
+            elif filename in SHELL_LOAD_FILES and not is_on_apply and root==patch_path:
                 pass
             else:
-                path_within_zip = os.path.relpath(
-                            os.path.join(root,filename),
-                            os.path.join(patch_path,"..")
-                        )
                 zip_handle.write(
                     os.path.join(root,filename),
-                    path_within_zip
+                    rel_path_within_patch
                 )
-                log(f"Loading \"{path_within_zip}\"")
+                log(f"Loading \"{rel_path_within_patch}\"")
     log("Loaded into zip format")
 
 if args.no_firmware:
@@ -167,7 +169,7 @@ else:
     file.write("""
     print("Updating RoboCon files")
     print("")
-    os.system(f'cp -a /tmp/{patch}/home/pi/* /home/pi')
+    os.system(f'cp -a /tmp/{patch}/home/* /home')
     os.system(f'cp -a /tmp/{patch}/etc/* /etc')
     os.system("chown pi:pi /home/pi")
     print("")""")
@@ -178,9 +180,17 @@ else:
         log(f"Loading {len(packages)} packages:")
         for package in packages:
             file.write(f"\n    os.system(f\"pip3 install {{patch}}/{package}\")")
-            log(f" - Loaded package {package}")
+            log(f" - @/{package}")
     # END PACKAGES ONLY
             
+    # ON APPLY FILE
+    if on_apply_found:
+        log("Adding on apply file:")
+        file.write("\n    print(\"Running additional setup script\")")
+        file.write(f"\n    os.path.join(f\"bash {{patch}}/{args.on_apply}\")")
+        log(f" - @/{args.on_apply}")
+    # END ON APPLY FILE 
+    
     file.write("""
     print("Finishing Off")
     file = open(f'/{patch}','w+')

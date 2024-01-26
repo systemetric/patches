@@ -24,3 +24,4 @@ You can then run `py ./build-patch.py [patch name]` to build the patch into a `.
 | `--no-firmware`               | Prevents the firmware update from being applied. Does not remove the `.hex` file              |
 | `--no-packages`               | Prevents the packages from being installed. Does not remove the `.whl` files                  |
 | `--no-description`            | Ignores the description loaded through `description.patchmeta` or `-d`                        |
+| `--root_packages`             | Ignores any `.whl` files which are not at the root of the patch directory                     |
