@@ -93,6 +93,8 @@ elif len(args.description)>0:
 
 if args.write_zip_out:
     output_path = os.path.join("zips",out_patchname+".zip")
+    if not os.path.exists("zips"):
+        os.mkdir("zips")
     with open(output_path,"wb") as file:
         file.write(mem_zip.getvalue())
     log(f"Zip written to \"{output_path}\"")
