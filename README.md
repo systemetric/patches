@@ -1,5 +1,7 @@
 # patches
-This is mainly so that checking code for 2024_p1 is easier, but in future we can add patches here as well so we can check them collectively easier. 
+This is mainly so that checking code for 2024_p1 is easier, but in future we can add patches here as well so we can check them collectively easier.
+
+Finished and built patches are now found in the `releases` folder.
 
 ## build-patch.py
 To build a patch, first place the patch directory in the patches subdirectory of this repo. 
