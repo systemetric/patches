@@ -1,1 +1,5 @@
-An extension of the initial patch 2 to update the docs which are on the bot.
+This patch is exclusively for the team who received a part built patch 2 without the following changes.
+
+When patch 2 was initially built, the docs did not update on the brain.
+This patch includes the entire built docs site, so this will overwerite the old docs.
+** This now makes functional docs **
