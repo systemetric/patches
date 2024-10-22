@@ -1,0 +1,44 @@
+# Debug USB sticks
+
+# Will
+# Serial number 1740010C5B02580F is "J Williams", a black 2GB Cruzer stick
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="1740010C5B02580F", ACTION=="add",     SYMLINK+="DebugUSB", RUN+="/bin/systemctl --no-block start debug_usb@%k.service",   GOTO="custom_names_end"
+# Serial number AA00000000007540 is Cloudstack bottle opener
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="AA00000000007540", ACTION=="add",     SYMLINK+="DebugUSB", RUN+="/bin/systemctl --no-block start debug_usb@%k.service",   GOTO="custom_names_end"
+# Skyler
+# The pink USB
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="C0D86D77",     ACTION=="add",     SYMLINK+="DebugUSB", RUN+="/bin/systemctl --no-block start debug_usb@%k.service",   GOTO="custom_names_end"
+# Holly
+# Lexar USB
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="AA04014300010616",     ACTION=="add",     SYMLINK+="DebugUSB", RUN+="/bin/systemctl --no-block start debug_usb@%k.service",   GOTO="custom_names_end"
+# College
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="AA0100000173",     ACTION=="add",     SYMLINK+="DebugUSB", RUN+="/bin/systemctl --no-block start debug_usb@%k.service",   GOTO="custom_names_end"
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="AA0100000182",     ACTION=="add",     SYMLINK+="DebugUSB", RUN+="/bin/systemctl --no-block start debug_usb@%k.service",   GOTO="custom_names_end"
+
+# Arena USB sticks
+# Will
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="25173301F2464900", ACTION=="add",     SYMLINK+="ArenaUSB", RUN+="/bin/systemctl --no-block restart arena_usb@%k.service", GOTO="custom_names_end"
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="08018A4153407992", ACTION=="add",     SYMLINK+="ArenaUSB", RUN+="/bin/systemctl --no-block restart arena_usb@%k.service", GOTO="custom_names_end"
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="09917A4173B12A27", ACTION=="add",     SYMLINK+="ArenaUSB", RUN+="/bin/systemctl --no-block restart arena_usb@%k.service", GOTO="custom_names_end"
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="0D0DC315270030B4", ACTION=="add",     SYMLINK+="ArenaUSB", RUN+="/bin/systemctl --no-block restart arena_usb@%k.service", GOTO="custom_names_end"
+# College
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="AA0100000187",     ACTION=="add",     SYMLINK+="ArenaUSB", RUN+="/bin/systemctl --no-block restart arena_usb@%k.service", GOTO="custom_names_end"
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="AA0100000201",     ACTION=="add",     SYMLINK+="ArenaUSB", RUN+="/bin/systemctl --no-block restart arena_usb@%k.service", GOTO="custom_names_end"
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="AA0400000163",     ACTION=="add",     SYMLINK+="ArenaUSB", RUN+="/bin/systemctl --no-block restart arena_usb@%k.service", GOTO="custom_names_end"
+KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="AA0400000141",     ACTION=="add",     SYMLINK+="ArenaUSB", RUN+="/bin/systemctl --no-block restart arena_usb@%k.service", GOTO="custom_names_end"
+
+# Fallback case for any other USB storage - mount into RobotUSB
+KERNEL=="sd[a-z]1",                                           ACTION=="add",     SYMLINK+="RobotUSB", RUN+="/bin/systemctl --no-block restart robot_usb@%k.service"
+KERNEL=="sd[a-z]1",                                           ACTION=="remove",  SYMLINK+="RobotUSB", RUN+="/bin/systemctl --no-block stop    robot_usb@%k.service"
+
+
+
+
+
+# Remove storage - don't really want random reboots while moving storage safely, so commented out
+#KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="25173301F2464900", ACTION=="remove",                      RUN+="/bin/systemctl --no-block stop    arena_usb@%k.service", GOTO="custom_names_end"
+#KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="08018A4153407992", ACTION=="remove",                      RUN+="/bin/systemctl --no-block stop    arena_usb@%k.service", GOTO="custom_names_end"
+#KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="09917A4173B12A27", ACTION=="remove",                      RUN+="/bin/systemctl --no-block stop    arena_usb@%k.service", GOTO="custom_names_end"
+#KERNEL=="sd[a-z]1", ENV{ID_SERIAL_SHORT}=="0D0DC315270030B4", ACTION=="remove",                      RUN+="/bin/systemctl --no-block stop    arena_usb@%k.service", GOTO="custom_names_end"
+
+LABEL="custom_names_end"
