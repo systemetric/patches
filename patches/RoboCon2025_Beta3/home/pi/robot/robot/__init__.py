@@ -52,7 +52,7 @@ __all__ = (
     "MARKER",
     "BASE_MARKER",
     "ARENA_MARKER",
-    "POTATO_MARKER",
+    "TARGET_MARKER",
     "MARKER_TYPE",
     "TEAM",
     "RoboConUSBCamera"
