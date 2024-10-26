@@ -65,21 +65,19 @@ class CytronBoard():
 
     def __getitem__(self, index):
         """Returns the current PWM value in RC units. Adds a sign to represent"""
-        if index not in (1, 2):
+        if index not in (0, 1):
             raise IndexError(
-                f"motor index must be in (1,2) but instead got {index}")
+                f"motor index must be in (0,1) but instead got {index}")
 
-        index -= 1
         return self._percentages[index]
 
     def __setitem__(self, index, percent):
         """Clamps input value, converts from percentage to wiring pi format and
         sets a PWM format"""
-        if index not in (1, 2):
+        if index not in (0, 1):
             raise IndexError(
-                f"motor index must be in (1,2) but instead got {index}")
+                f"motor index must be in (0,1) but instead got {index}")
 
-        index -= 1
         percent = clamp(percent, -100, 100)
         self._percentages[index] = percent
 
