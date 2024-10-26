@@ -439,17 +439,10 @@ class GreenGiantGPIOPinList():
                              # GreenGiantGPIOPin's
 
     def __getitem__(self, index):
-        if self._version < 10:
-            return self._list[_decrement_pin_index(index)]
-        else:
-            return self._list[index]
+        return self._list[index]
 
     def __setitem__(self, index, value):
-        if self._version < 10:
-            internal_index = _decrement_pin_index(index)
-        else:
-            internal_index = index
-        self._list[internal_index].__setitem__(value)
+        self._list[index].__setitem__(value)
 
     def update_modes(self):
         """All of the modes must be updated in order due to a bug in the GG
