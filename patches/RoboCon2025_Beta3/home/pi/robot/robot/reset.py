@@ -33,9 +33,10 @@ def reset():
     # probably should wrap this all up in a .off()
     internal = gg.GreenGiantInternal(bus)
     internal.enable_motors(False)
-    #internal.set_motor_power(False)
     internal.set_12v_acc_power(False)    # Not sure, should this be controlled by user?
-    internal.set_5v_acc_power(False)
+    if version >= 10:
+        internal.set_5v_acc_power(False)
+    #internal.set_motor_power(False)
     internal.set_user_led(False)
 
     bus.close()
