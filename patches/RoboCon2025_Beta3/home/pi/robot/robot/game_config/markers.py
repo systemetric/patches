@@ -79,9 +79,10 @@ class MARKER(BASE_MARKER): # This is literally just how the code gets the differ
     @staticmethod
     def get_size(id: int):
         tg = MARKER.by_id(id)
-        if tg.owning_team == TEAM["ARENA"]:
+        if tg.type==MARKER_TYPE.ARENA:
             return 0.2
-        return 0.08
+        else:
+            return 0.08
     
     @staticmethod
     def by_id(id: int, team: typing.Union[TEAM, None] = None) -> BASE_MARKER: # team is currently unused, but it is referenced throughout the code. It is the team of the robot I believe (check this)
