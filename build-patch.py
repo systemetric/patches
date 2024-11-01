@@ -57,6 +57,7 @@ with ZipFile(mem_zip,"w",ZIP_DEFLATED) as zip_handle:
             
 
             if filename=="description.patchmeta" and root==patch_path:
+                log("Found description.patchmeta")
                 description = open(os.path.join(patch_path,filename)).read()
             elif filename in SHELL_LOAD_FILES and root==patch_path:
                 pass
