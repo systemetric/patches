@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import base64
 from zipfile import ZipFile, ZIP_DEFLATED
 import argparse
