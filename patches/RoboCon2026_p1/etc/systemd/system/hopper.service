@@ -1,0 +1,14 @@
+[Unit]
+Description=Hopper pipe multiplexer service for Hills Road RoboCon
+
+[Service]
+WorkingDirectory=/home/pi
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+Group=root
+ExecStart=/bin/hopper.server /home/pi/pipes
+
+[Install]
+WantedBy=multi-user.target

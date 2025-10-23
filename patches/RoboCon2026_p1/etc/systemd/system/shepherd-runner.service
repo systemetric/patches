@@ -1,0 +1,17 @@
+[Unit]
+Description=Shepherd runner service for Hills Road RoboCon
+Requires=sys-devices-platform-soc-3f804000.i2c-i2c\x2d1-i2c\x2ddev-i2c\x2d1.device hopper.service
+After=sys-devices-platform-soc-3f804000.i2c-i2c\x2d1-i2c\x2ddev-i2c\x2d1.device hopper.service
+StartLimitIntervalSec=0
+
+[Service]
+WorkingDirectory=/home/pi/shepherd/runner
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+Group=root
+ExecStart=/usr/bin/env python3 /home/pi/shepherd/runner/start.py
+
+[Install]
+WantedBy=multi-user.target

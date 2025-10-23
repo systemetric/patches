@@ -1,0 +1,7 @@
+pipes/
+__pycache__/
+dist/
+build/
+hopper.egg-info/
+tmplog.txt
+.gdb_history
