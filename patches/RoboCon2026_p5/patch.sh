@@ -25,4 +25,6 @@ systemctl start shepherd-runner.service
 systemctl start shepherd.service
 systemctl start shepherd-resize_helper.service
 
+systemctl enable bonjour_robot.service
+
 i2cset -y 1 8 25 0

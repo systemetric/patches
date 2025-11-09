@@ -1,0 +1,10 @@
+# /etc/systemd/system/bonjour_robot.service
+[Unit]
+Description=IP Changed
+
+[Service]
+ExecStart=:/bin/bash -c "avahi-publish -a -R `if [ -e /media/ArenaUSB/Bonjour ]; then cat /media/ArenaUSB/Bonjour;  else echo robot.local ;fi`  `hostname -I | awk '{print $1}' `"
+SyslogIdentifier=MDNS_name_service
+
+[Install]
+WantedBy=multi-user.target default.target
