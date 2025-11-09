@@ -9,6 +9,11 @@ systemctl stop shepherd_tmpfs_hack.service
 i2cset -y 1 8 25 1
 
 rm -f   /bin/hopper.server                                                        >> ${DEBUG_LOG}
+
+if [ -f /etc/systemd/system/shepherd-runner_helper.service ]; then
+    rm -f /etc/systemd/system/shepherd-runner_helper.service                      >> ${DEBUG_LOG}
+fi
+
 cp -arv ${PATCH_DIRECTORY}/home/pi/* /home/pi                                     >> ${DEBUG_LOG}
 cp -arv ${PATCH_DIRECTORY}/etc/systemd/system/* /etc/systemd/system               >> ${DEBUG_LOG}
 cp -arv ${PATCH_DIRECTORY}/usr/local/bin/* /usr/local/bin                         >> ${DEBUG_LOG}

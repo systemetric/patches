@@ -10,6 +10,7 @@
 - bug fixes in Sheep
 - addition of robot USB logger service, started by `robot_usb.sh`
 - addition of FIFO cleanup services for Shepherd-runner and robot USB logger
+- removal of `/etc/systemd/system/shepherd-runner_helper.service` (old `shepherd-runner.service`)
 
 ## Known Issues
 
