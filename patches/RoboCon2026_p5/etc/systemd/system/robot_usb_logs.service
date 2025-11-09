@@ -1,9 +1,8 @@
 [Unit]
-Description=Log handler for RobotUSB with Hopper
-After=robot_usb@.service
+Description=Log handler to collect logs onto a USB stick from Hopper
 
 [Service]
 ExecStart=/usr/local/bin/robot_usb_logs.sh
-
-[Install]
-WantedBy=multi-user.target
+Type=simple
+Restart=always
+RestartSec=1

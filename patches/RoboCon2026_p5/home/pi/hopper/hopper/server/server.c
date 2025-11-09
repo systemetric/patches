@@ -65,6 +65,64 @@ void prepend_pipe_list(struct PipeSet **head, struct PipeSet *set) {
     *head = set;
 }
 
+struct PipeSet *remove_pipe_by_name(struct PipeSet **pipes, struct PipeInfo *info) {
+    struct PipeSet *tgt;
+
+    struct PipeSet head;
+    struct PipeInfo head_info;
+    head_info.name = "_HEAD_";
+    head.info = &head_info;
+    head.next = *pipes;
+
+    tgt = &head;
+
+    while (tgt->next) {
+        //printf("checking %s\n", tgt->next->info->name);
+        if (!strcmp(tgt->next->info->name, info->name)) {
+            struct PipeSet *to_free = tgt->next;
+           // printf("removing %s, connecting %s to %s\n", to_free->info->name, tgt->info->name, tgt->next->next->info->name);
+            tgt->next = tgt->next->next;
+
+            // This is redundant if the pipe is not at the start of the list
+            *pipes = head.next;
+            return to_free;
+        }
+
+        tgt = tgt->next;
+    }
+
+    return NULL;
+}
+
+struct PipeSet *remove_output_pipe_by_name(struct PipeSet **pipes, struct PipeInfo *info) {
+    struct PipeSet *tgt;
+
+    struct PipeSet head;
+    struct PipeInfo head_info;
+    head_info.name = "_HEAD_";
+    head.info = &head_info;
+    head.next_output = *pipes;
+
+    tgt = &head;
+
+    while (tgt->next_output) {
+        //printf("checking %s\n", tgt->next_output->info->name);
+        if (!strcmp(tgt->next_output->info->name, info->name)) {
+            struct PipeSet *to_free = tgt->next_output;
+          //  printf("removing %s, connecting %s to %s\n", to_free->info->name, tgt->info->name, tgt->next_output->next_output->info->name);
+            tgt->next_output = tgt->next_output->next_output;
+
+            // This is redundant if the pipe is not at the start of the list
+            *pipes = head.next_output;
+            return to_free;
+        }
+
+        tgt = tgt->next_output;
+    }
+
+    return NULL;
+}
+
 void free_hopper_buffer(struct HopperBuffer *buffer) {
     if (!buffer)
         return;
@@ -185,7 +243,7 @@ int load_new_pipe(struct HopperData *data, const char *path) {
         set->next_output = data->outputs[set->info->handler];
         data->outputs[set->info->handler] = set;
 
-        set->rd_ptr = data->buffers[set->info->handler]->last_wr_ptr;
+        set->rd_ptr = NULL;
     }
 
     printf("added fifo '%s'\n", path);
@@ -215,6 +273,11 @@ void pipe_set_status_active(struct PipeSet *set, struct HopperData *data) {
 
     if (set->info->type == PIPE_SRC)
         epoll_add_src_pipe(data, set);
+
+    if (!set->rd_ptr)   // For freshly created pipes
+        set->rd_ptr = data->buffers[set->info->handler]->wr_ptr;
+    else    // Pipes transitioning from inactive get last message
+        set->rd_ptr = data->buffers[set->info->handler]->last_wr_ptr;
 
     set->status = PIPE_ACTIVE;
 
@@ -285,20 +348,23 @@ int handle_inotify_event(struct HopperData *data) {
         if (!info)
             return 1;
 
-        struct PipeSet **tgt = &data->pipes;
+        int removed = 0;
 
-        while (*tgt) {
-            if (!strcmp((*tgt)->info->name, info->name)) {
-                struct PipeSet *to_free = *tgt;
-                *tgt = (*tgt)->next;
+        struct PipeSet *to_free = remove_pipe_by_name(&data->pipes, info);
+        if (to_free && info->type == PIPE_DST) {
+            // Output pipes need to be removed from a separate linked list
+            // as well as the main one
+            to_free = remove_output_pipe_by_name(&data->outputs[info->handler], info);
+            if (to_free) {
                 free(to_free);
-                break;
+                removed = 1;
             }
-
-            tgt = &(*tgt)->next;
+        } else if (to_free) {
+            free(to_free);
+            removed = 1;
         }
 
-        if (tgt)
+        if (removed)
             printf("removed %d/%s\n", info->handler, info->name);
         else
             printf("pipe %d/%s not found\n", info->handler, info->name);
@@ -312,7 +378,7 @@ int flush_and_scan_pipes(struct HopperData *data) {
     struct PipeSet *set = data->pipes;
 
     while (set) {
-        if (set->status == PIPE_INACTIVE && set->info->type == PIPE_DST)
+        if (set->status == PIPE_INACTIVE)
             reopen_pipe_set(set, data);
 
         if (set->status == PIPE_ACTIVE && set->info->type == PIPE_DST)
@@ -345,6 +411,9 @@ int run_epoll_cycle(struct HopperData *data) {
         if (events[i].events & EPOLLIN)
             if ((res = read_fifo(data, set)) < 0)
                 return res;
+
+        if (events[i].events & EPOLLHUP)
+            pipe_set_status_inactive(set, data);
     }
 
     flush_and_scan_pipes(data);
