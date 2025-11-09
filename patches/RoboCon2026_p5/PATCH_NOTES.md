@@ -1,6 +1,6 @@
 # RoboCon2026_p5 patch notes
 
-**This patch encompasses 2026_p3 and 2026_p4, use this one instead.**
+**This patch encompasses 2026_p2, 2026_p3 and 2026_p4, use this one instead.**
 
 ## Changes
 
