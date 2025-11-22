@@ -15,6 +15,7 @@ parser.add_argument("patchname")
 parser.add_argument("-o","--output-location", default="built")
 parser.add_argument("-d","--description",default="")
 parser.add_argument("-v","--verbose",action="store_true")
+parser.add_argument("--use-patch-script", action="store_true")
 parser.add_argument("--dev", action="store_true")
 parser.add_argument("--write-zip-out",action="store_true")
 parser.add_argument("--no-firmware",action="store_true")
@@ -31,9 +32,10 @@ def log(*strs):
 def newlineify(string, length):
     return '\n'.join(string[i:i+length] for i in range(0,len(string),length))
 
-SHELL_LOAD_FILES = ["patch.sh","apply.sh"]
+
 description = ""
 firmware_update = False
+use_patch_script = args.use_patch_script
 packages = []
 out_patchname = args.patchname if not args.dev else args.patchname+".preview"
 mem_zip = BytesIO()
@@ -60,8 +62,6 @@ with ZipFile(mem_zip,"w",ZIP_DEFLATED) as zip_handle:
 
             if filename=="description.patchmeta" and root==patch_path:
                 description = open(os.path.join(patch_path,filename)).read()
-            elif filename in SHELL_LOAD_FILES and root==patch_path:
-                pass
             else:
                 path_within_zip = os.path.relpath(
                             os.path.join(root,filename),
@@ -136,11 +136,13 @@ import os.path
     file.write("""
     # The patch has been applied already, it should be difficult to get here, but it can be reached by using the start button
     # after the mandatory reboot
-    print (f"Patch {patch} already applied")
+    print(f"Patch {patch} already applied")
     print("")
-    print ("Don't Walk, Do the Robot")
+    print("Don't Walk, Do the Robot")
     print("")
-    R=robot.Robot()
+    R = robot.Robot()
+    while True:
+        time.sleep(1)
 else:
     R = robot.Robot()
 
@@ -151,6 +153,15 @@ else:
     print(f"Applying {patch}")
     os.system('/usr/bin/unzip -q /tmp/patch.zip -d /tmp')
     print("")
+
+""")
+
+    if use_patch_script:
+        file.write("""
+    os.system(f'PATCH_DIRECTORY="/tmp/{patch}" . /tmp/{patch}/patch.sh')
+        """)
+    else:
+        file.write("""
     R.set_user_led(True)
     print("Stopping helper services")
     print("")
@@ -168,10 +179,12 @@ else:
     R.set_user_led(True) # Restart LED after firmware update""")
         log("Loaded firmware update")
     # END FIRMWARE UPDATE ONLY
-    
-    file.write("""
+
+    if not use_patch_script:
+        file.write("""
     print("Updating RoboCon files")
     print("")
+    os.system()
     os.system(f'cp -a /tmp/{patch}/home/pi/* /home/pi')
     os.system(f'cp -a /tmp/{patch}/etc/* /etc')
     os.system("chown pi:pi /home/pi")
@@ -195,6 +208,7 @@ else:
     print("")
     os.system("systemctl start shepherd_tmpfs_hack.service")
     os.system("systemctl start shepherd-resize_helper.service")
+    os.system(f'sed -i "s/\\(.*_logger.info(\\"Patch Version:\\).*/\\1     {patch}\\"\\)/" /home/pi/robot/robot/wrapper.py')
     R.set_user_led(False)
     print("Rebooting")
     time.sleep(1)
@@ -203,8 +217,4 @@ else:
 
     log("Patch Packed")
     print("[Builder] Done :)")
-
-#    os.system("pip3 install ${PATCH_DIRECTORY}/aionotify-0.2.0-py3-none-any.whl")
-#    os.system("pip3 install ${PATCH_DIRECTORY}/websockets-11.0.3-py3-none-any.whl")
-
 
