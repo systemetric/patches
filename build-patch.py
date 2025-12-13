@@ -208,7 +208,7 @@ else:
     print("")
     os.system("systemctl start shepherd_tmpfs_hack.service")
     os.system("systemctl start shepherd-resize_helper.service")
-    os.system(f'sed -i "s/\\(.*_logger.info(\\"Patch Version:\\).*/\\1     {patch}\\"\\)/" /home/pi/robot/robot/wrapper.py')
+    os.system(f'sed -i "s/\\\\(.*_logger.info(\\\\"Patch Version:\\\\).*/\\\\1     {patch}\\\\"\\\\)/" /home/pi/robot/robot/wrapper.py')
     R.set_user_led(False)
     print("Rebooting")
     time.sleep(1)
